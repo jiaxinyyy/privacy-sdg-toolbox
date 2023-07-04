@@ -211,3 +211,80 @@ class ReprosynGenerator(Generator):
     def label(self):
         """Cherry on top."""
         return self._label
+
+class TruseticsGenerators(Generator):
+    """This generator simply calls a TruseticsSynthesizer."""
+    def __init__(self, synthesizer, transformer, preprocessor_eps=0.5):
+        super().__init__()
+        self.synthesizer = copy.deepcopy(synthesizer) # Save a raw synthesizer, since the network dim will change each time fit() is called
+        self.transformer = copy.deepcopy(transformer)
+        self.preprocessor_eps = preprocessor_eps
+
+    def fit(self, dataset):
+        assert isinstance(dataset, tapas.datasets.TabularDataset), 'dataset must be of class TabularDataset'
+        self.dataset = dataset
+
+        df = self.dataset.data
+        #categorical_cols = df.select_dtypes(include=['object', 'category']).columns
+        # Print unique values for each categorical column
+        #for col in categorical_cols:
+        #    print("Column Name: ", col)
+        #    print(df[col].unique())
+
+        # Reset synthesizer and transformers
+        #self.synthesizer = copy.deepcopy(self.synthesizer_raw)
+        #self.transformer = copy.deepcopy(self.transformer_raw)
+        self.synthesizer.gan.model_loaded = False
+        for col, tf in self.transformer.items():
+            tf._clear_fit()
+
+        self.synthesizer.fit(self.dataset.data, preprocessor_eps = self.preprocessor_eps, transformer=self.transformer)
+        self.trained = True
+
+    def generate(self, num_samples = None, random_state = None):
+        if self.trained: 
+            if num_samples is None:
+                return self.dataset
+            # ToDO: introduce random_state
+            result_df = self.synthesizer.sample(num_samples)
+            #result_df.to_csv('tapasSyn_used.csv', index=False, header=False) # output the csv without header
+            #data_descript_json = self.dataset.description # Use the same description for consistent one-hot encoding.
+            #print("Stored real_df:", self.dataset.data.shape)
+            #data_descript_json = data_description(self.dataset.data)
+            # Write the JSON string to a file
+            #with open("tapasSyn_used.json", "w") as f:
+            #    f.write(str(data_descript_json))
+            # COnvert to a tapas dataset object
+            print("dataset.description",type(self.dataset.description))
+            print(self.dataset.description)
+            #print(result_df.to_string())
+            #for i, cdict in enumerate(self.dataset.description):
+            #    name = cdict['name']
+            #    d_type = cdict['type']
+            #    d_repr = cdict['representation']
+            #    print(name, d_type, d_repr)
+            synthetic_data = tapas.datasets.TabularDataset.read_from_string(result_df.to_csv(index=False,header=False),
+                                                                            self.dataset.description)
+            #synthetic_data = tapas.datasets.TabularDataset.read('tapasSyn_used')
+
+            
+            #data = synthetic_data.as_numeric
+            #data_array = np.concatenate(
+            #        [
+            #            np.nanmean(data, axis=0),
+            #            np.nanmedian(data, axis=0),
+            #            np.nanvar(data, axis=0),
+            #        ]
+            #    )
+            #print("Shape of dataset_array is:", data_array.shape, "result_df:", result_df.shape, "data:", data.shape)
+            return synthetic_data
+        else:
+            raise RuntimeError("No dataset provided to generator")
+        
+    def __call__(self, dataset, num_samples, random_state = None):
+        self.fit(dataset)
+        return self.generate(num_samples, random_state = random_state) 
+
+    @property
+    def label(self):
+        return "Trusetics"

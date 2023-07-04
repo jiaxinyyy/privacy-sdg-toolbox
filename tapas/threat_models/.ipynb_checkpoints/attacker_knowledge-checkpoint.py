@@ -506,7 +506,7 @@ class LabelInferenceThreatModel(TrainableThreatModel):
 
     def test(
         self, attack: Attack, num_samples: int = 100, ignore_memory: bool = False,
-        synthetic_datasets: Dataset = None
+        synthetic_datasets: Dataset = None, num_training_records: int = 162
     ) -> tuple[list[int], list[int]]:
         """
         Test an attack against this threat model. This samples `num_samples`
@@ -523,7 +523,7 @@ class LabelInferenceThreatModel(TrainableThreatModel):
         ignore_memory: bool, default False
             Whether to ignore the memoized datasets. Not recommended.
         synthetic_datasets: Dataset
-            the synthetic dataset we generate and want to evaluate on
+            the synthetic dataset that we generate and want to evaluate on
         Returns
         -------
         tuple(list(int), list(int))
@@ -540,7 +540,7 @@ class LabelInferenceThreatModel(TrainableThreatModel):
             )
         else:
             # create num_samples synthetic subssets, each w/ num_training_records 
-            num_training_records = 162
+            # num_training_records = 162
             test_datasets = synthetic_datasets.create_subsets(num_samples, num_training_records)
             # generate labels for the input synthetic_datasets 
             # NOW: a nested list with all the lists inside with values being True
