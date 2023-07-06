@@ -506,7 +506,8 @@ class LabelInferenceThreatModel(TrainableThreatModel):
 
     def test(
         self, attack: Attack, num_samples: int = 100, ignore_memory: bool = False,
-        synthetic_datasets: Dataset = None, num_training_records: int = 162, target_records
+        synthetic_datasets: Dataset = None, num_training_records: int = 162, 
+        target_records: list = [0]
     ) -> tuple[list[int], list[int]]:
         """
         Test an attack against this threat model. This samples `num_samples`
