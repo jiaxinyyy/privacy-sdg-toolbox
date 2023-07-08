@@ -239,6 +239,9 @@ class BinaryLabelInferenceAttackSummary(LabelInferenceAttackSummary):
             # Remove potential duplicates.
             significant_thresholds = np.unique(significant_thresholds)
             # Compute the TP and FP for each threshold.
+            # print("debug")
+            # print(self.scores)
+            # print(self.labels == 1)
             tp = np.array([
                 np.mean(self.scores[self.labels == 1] >= t)
                 for t in significant_thresholds
@@ -263,7 +266,7 @@ class BinaryLabelInferenceAttackSummary(LabelInferenceAttackSummary):
                             self.fp,
                             self.mia_advantage,
                             self.privacy_gain,
-                            self.auc,
+                            # self.auc, # TODO: use auc when truth labels are not all TRUE
                             self.effective_epsilon,
                         ]
                     ],
@@ -272,7 +275,7 @@ class BinaryLabelInferenceAttackSummary(LabelInferenceAttackSummary):
                         "false_positive_rate",
                         "mia_advantage",
                         "privacy_gain",
-                        "auc",
+                        # "auc", # TODO: use auc when truth labels are not all TRUE
                         "effective_epsilon",
                     ],
                 ),

@@ -552,10 +552,11 @@ class LabelInferenceThreatModel(TrainableThreatModel):
             # size equal to the number of the datasets
             subset_labels = [True] * len(target_records)
             truth_labels = [subset_labels] * num_samples
+            truth_labels = [l[0] for l in truth_labels] # all_labels = [l[self.current_label] for l in all_labels]
         pred_labels = attack.attack(test_datasets)
         scores = attack.attack_score(test_datasets)
         attack_summary = self._wrap_output(truth_labels, pred_labels, scores, attack)
-        return (attack_summary, plot_roc(truth_labels, scores))
+        return (attack_summary, plot_roc(truth_labels, scores)) # attack_summary 
 
     def _wrap_output(self, truth_labels, pred_labels, scores, attack):
         """

@@ -137,7 +137,6 @@ class MIALabeller(AttackerKnowledgeWithLabel):
             if self.generate_pairs:
                 mod_datasets.append(dataset2)
                 mod_labels.append(_convert(labels == False))  # Negation.
-
         return mod_datasets, mod_labels
 
     @property

@@ -2,6 +2,8 @@ import plotly.graph_objects as go
 from sklearn.metrics import roc_curve, auc
 
 def plot_roc(y, y_score):
+    print(y)
+    print(y_score)
     fpr, tpr, thresholds = roc_curve(y, y_score)
     roc_auc = auc(fpr, tpr)
 
